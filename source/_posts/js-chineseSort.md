@@ -2,6 +2,7 @@
 title: Js 中文排序
 date: 2019-11-08 15:22:15
 tags:
+description: 学习于网易云音乐webapp开发时给歌手按照拼音排序
 ---
 
 ### sort() 方法

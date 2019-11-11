@@ -2,6 +2,7 @@
 title: 全栈工程师最后一公里实战
 date: 2019-11-08 17:06:44
 tags:
+description: 服务器上线node项目、安装mongodb、配置https
 ---
 
 ### 远程登录服务器
@@ -196,9 +197,8 @@ $ nvm alias default v7.9.0 # 使系统里面的默认版本是 v7.9.0
 
 #### 升级 npm
 
-# 国内网速慢的话，可以考虑用淘宝的源
-
 ```bash
+# 国内网速慢的话，可以考虑用淘宝的源
 $ npm install --registry=https://registry.npm.taobao.org install -g npm
 ```
 
@@ -349,6 +349,7 @@ $ sudo iptables-restore < /etc/iptables.up.rules
 
 ##### 启动
 
+```bash
 # mongodb 的日志文件
 
 \$ cat /var/log/mongodb/mongod.log
@@ -364,6 +365,7 @@ $ sudo iptables-restore < /etc/iptables.up.rules
 # 查看 mongodb 服务的状态
 
 \$ sudo service mongod status
+```
 
 ##### 连接
 
@@ -427,40 +429,229 @@ $ git push -u origin master
 使用 PM2，并采用配置文件的方式来部署项目。
 
 ##### 服务端准备
+
 (1) 准备好程序所在的文件夹
 
+```bash
 $ sudo mkdir -p /www/website
 $ sudo chmod 777 /www/website
+```
+
 ##### 从客户端发布
-(1) 本地在项目中创建PM2 配置文件
+
+(1) 本地在项目中创建 PM2 配置文件
 
 #/ecosystem.json
 
-{  
-    "apps": [
-        {      
-            "name": "Website", // 应用名称      
-            "script": "app.js", // 应用入口      
-            "env": {// 启动应用时的环境变量        
-            "COMMON_VARIABLE": true      
-            },      
-            "env_production": {// 生产环境启动应用时的环境变量        
-                "NODE_ENV": "production"      
-            }    
-        }  
-    ],  
-    "deploy": {    
-        "production": { // 任务名      
-        "user": "imooc_manager", // 生产服务器账号      
-        "host": ["120.26.235.4"], // 生产服务器地址      
-        "port": "39999", // 服务器 SSH 端口      
-        "ref": "origin/master", // 分支      
-        "repo": "git@git.oschina.net:wolf18387/backend-website.git", // 仓库地址      
-        "path": "/www/website/production", // 应用部署路径(绝对路径, 要确保该路径对 imooc_manager 可读可写可执行)      
-        "ssh_options": "StrictHostKeyChecking=no",  
-        "post-deploy": "npm install --registry=https://registry.npm.taobao.org && grunt build && pm2 startOrRestart ecosystem.json --env production",    
-        "env": { // 环境变量设置        
-            "NODE_ENV": "production"      
-        }    
-    }  
+```js
+{
+ "apps": [
+{
+ "name": "Website", // 应用名称
+ "script": "app.js", // 应用入口
+ "env": {// 启动应用时的环境变量
+ "COMMON_VARIABLE": true
+ },
+ "env_production": {// 生产环境启动应用时的环境变量
+ "NODE_ENV": "production"
+ }
+ }
+ ],
+ "deploy": {
+ "production": { // 任务名
+ "user": "imooc_manager", // 生产服务器账号
+ "host": ["120.26.235.4"], // 生产服务器地址
+ "port": "39999", // 服务器 SSH 端口
+ "ref": "origin/master", // 分支
+ "repo": "git@git.oschina.net:wolf18387/backend-website.git", // 仓库地址
+ "path": "/www/website/production", // 应用部署路径(绝对路径, 要确保该路径对 imooc_manager 可读可写可执行)
+ "ssh_options": "StrictHostKeyChecking=no",
+ "post-deploy": "npm install --registry=https://registry.npm.taobao.org && grunt build && pm2 startOrRestart ecosystem.json --env production",
+ "env": { // 环境变量设置
+ "NODE_ENV": "production"
+ }
+ }
 }}
+```
+
+(2) 本地使用 PM2 部署到线上服务器
+
+```bash
+$ pm2 deploy ecosystem.json production setup
+```
+
+```bash
+# 新配置的服务器可能还没有使用过ssh连接GitHub，方法与服务器的ssh登录相似
+# 可以用以下命令测试
+$ ssh git@github.com
+```
+
+#### 从本地发布上线和更新服务器的 Nodejs 项目
+
+使用 PM2 实现本地控制远端代码更新和服务重启。
+
+##### 服务端准备
+
+```bash
+$ sudo vim  ~/.bashrc
+```
+
+由于 PM2 需要以交互的方式通过 SSH 连接服务器，需要注释掉下面的代码:
+
+```bash
+# If not running interactively, don't do anything
+#case $- in
+#	*i*);;
+#	*) return;;
+#esac
+```
+
+```bash
+$ source ~/.bashrc
+```
+
+##### 从客户端发布到服务端并启动应用
+
+```bash
+$ pm2 deploy ecosystem.json production
+```
+
+##### 修改入口代码
+
+```js
+let env = process.env.NODE_ENV || "development";
+let dbUrl = "mongodb://127.0.0.1:20811/数据库名";
+// 开发环境连接测试使用的 MongoDB 服务器
+if (env === "development") {
+  dbUrl = "mongodb://127.0.0.1/数据库名";
+}
+
+mongoose.connect(dbUrl, { useNewUrlParser: true });
+```
+
+##### nginx 配置
+
+/etc/nginx/conf.d/\*\*\*.conf
+
+```js
+upstream movie {
+  server 127.0.0.1:3001;
+}
+
+server {
+  listen 80;
+  server_name movie.iblack7.com;
+  location / {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forward-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Nginx-Proxy true;
+    proxy_pass http://movie;
+    proxy_redirect off;
+  }
+  // 静态文件路由配置
+  localtion ~* ^.+\.(jpg|jpeg|gif|png|ico|css|js|pdf|txt) {
+    root /www/movie/production/current/public; // 静态文件路径
+  }
+}
+```
+
+##### iptables 配置 打开特定端口
+
+/etc/iptables.up.rules
+
+```bash
+# movie
+-A INPUT -s 127.0.0.1 -p tcp --destination-port 3001 -m state --state NEW,ESTABLISHED -j ACCEPT
+-A OUTPUT -s 127.0.0.1 -p tcp --source-port 3001 -m state --state ESTABLISHED -j ACCEPT
+```
+
+```bash
+$ sudo iptables-restore < /etc/iptables.up.rules
+```
+
+### 使用和配置更安全的 HTTPS 协议
+
+#### SSL 证书
+
+##### SSL 证书分类
+
+| DV | 一般 | 个人博客、产品展示、中小企业网站 | 有些免费的可以选择，即便收费的也通常不贵，申请流程也比较简单。|
+| OV | 企业级别、等级较高 | 常用在一些电商网站、社交、 O2O 等涉及到用户资料、订单支付的场景 | 审核比较严格，价格不亲民，对业务有一定规模的可以考虑。|
+| EV | 按照严格身份验证标准颁发的证书，是目前全球最高等级的 SSL 证书，安全性非常高，使用这个证书的网站，浏览器地址栏一般会显示为绿色 | 常用金融支付、网上银行等资金交易比较敏感的场景。|
+
+##### SSL 证书有效期
+
+3 个月、一年；每次过期都需要更新证书，或者重新提交申请。可以通过一些工具或脚本，实现证书的自动更新。
+
+##### 免费的 SSL 证书
+
+沃通与 StarSSL 已经被 Google 与 Firefox 屏蔽。
+
+##### 付费的 SSL 证书
+
+赛门铁克、 Geotrust 、 亚洲诚信
+
+#### 云平台申请免费证书及 Nginx 配置
+
+又拍云、七牛云、腾讯云
+
+##### Nginx 配置
+
+(1) 将 SSL 证书文件上传到服务器
+
+```bash
+# 将 mini.iblack7.com 对应的 SSL 证书的 key 文件上传到服务器
+$ scp -P [ssh 端口] mini.iblack7.com/Nginx/2_mini.iblack7.com.key imoooc_manager@[服务器IP]:/home/imooc_manager/
+# 将 mini.iblack7.com 对应的 SSL 证书的证书文件上传到服务器
+$ scp -P [ssh 端口] mini.iblack7.com/Nginx/1_mini.iblack7.com_bundle.crt imoooc_manager@[服务器IP]:/home/imooc_manager/
+
+# 将 free.iblack7.com 对应的 SSL 证书的 key 文件上传到服务器
+$ scp -P [ssh 端口] free.iblack7.com/Nginx/2_free.iblack7.com.key imoooc_manager@[服务器IP]:/www/ssl/
+# 将 mini.iblack7.com 对应的 SSL 证书的证书文件上传到服务器
+$ scp -P [ssh 端口] free.iblack7.com/Nginx/1_free.iblack7.com_bundle.crt imoooc_manager@[服务器IP]:/www/ssl/
+```
+
+(2) nginx 配置更新
+
+```js
+upstream free {
+  server 127.0.0.1:3002;
+}
+
+# 将 HTTP 请求都重定向到 HTTPS 协议
+server {
+  listen 80;
+  server_name free.iblack7.com;
+  # rewrite ^(.*) https://$host$1 permanent;
+  return 301 https://free.iblack7.com$request_uri;
+}
+server {
+  #SSL--
+  listen 443; # https 协议的默认端口
+  server_name free.iblack7.com;
+  ssl on; # 启动 ssl 认证
+  ssl_certificate /www/ssl/1_free.iblack7.com_bundle.crt; # SSL 证书文件的路径
+  ssl_certificate_key /www/ssl/2_free.iblack7.com.key; # SSL key 文件的路径
+  ssl_session_timeout 5m;
+  ssl_protocals TLSv1 TLSv1.1 TLSv1.2; # SSL 证书采用的协议
+  ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE; # 配置的加密套件
+  ssl_prefer_server_chiphers on;
+  if ($ssl_protocol = "") {
+       rewrite ^(.*) https://$host$1 permanent;
+  }
+  #-- SSL
+  location / {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forward-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Nginx-Proxy true;
+    proxy_pass http://free;
+    proxy_redirect off;
+  }
+  // 静态文件路由配置
+  localtion ~* ^.+\.(jpg|jpeg|gif|png|ico|css|js|pdf|txt) {
+    root /www/app/production/current/public;
+  }
+}
+```

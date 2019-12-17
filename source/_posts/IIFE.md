@@ -2,6 +2,7 @@
 title: IIFE(立即调用函数表达式)
 date: 2019-12-17 16:13:30
 tags:
+description: IIFE 是一个定义时就会立即执行的 JavaScript 函数。
 ---
 
 ### IIFE(立即调用函数表达式)

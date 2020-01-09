@@ -112,10 +112,128 @@ Vue 的目录是脚手架自动创建的，App.vue 是 Vue 项目的根组件，
 
   这个还没有发现
 
-- 特性的绑定方法
+- 特性的绑定方法 属性绑定
 
   ```angular.js
   // 此处的iphone应该是个变量 <a [title]="iphone"></a>
+  ```
+
+- attribute、class 和 style 绑定
+
+  模版语法为那些不太适合属性绑定的场景提供了专门的单项数据绑定形式。
+
+  **attribute 绑定**
+
+  例如：
+
+  ```html
+  <tr>
+    <td colspan="{{1 + 1}}">Three-Four</td>
+  </tr>
+  ```
+
+  ```js
+  Template parse errors:
+  Can't bind to 'colspan' since it isn't a known native property
+  ```
+
+  **为什么会有这样的错误呢？**
+
+  正如提示中所说，`<td>`元素没有`colspan`属性。但是插值和属性绑定只能设置属性，不能设置attribute.
+
+  ```html
+  <table border=1>
+    <!--  expression calculates colspan=2 -->
+    <tr><td [attr.colspan]="1 + 1">One-Two</td></tr>
+
+    <!-- ERROR: There is no `colspan` property to set!
+      <tr><td colspan="{{1 + 1}}">Three-Four</td></tr>
+    -->
+
+    <tr><td>Five</td><td>Six</td></tr>
+  </table>
+  ```
+
+  **CSS 类绑定**
+
+  这个地方有个和`Vue`不一样的地方，在`Vue`中，我们可以使用这种方式来绑定`class`;
+  ```html
+  <div
+    class="static"
+    v-bind:class="{ active: isActive, 'text-danger': hasError }"
+  ></div>
+  ```
+  ```js
+  data: {
+  isActive: true,
+  hasError: false
+  }
+  ```
+
+  **结果渲染为**
+
+  ```html
+  <div class="static active"></div>
+  ```
+
+  我们再来看看`Angualr`与`Vue`不一样的地方，两者的形式基本一样，但是结果却是两种;
+
+  `Angular`的结果是当 `badCurly` 有值的时候会完全覆盖这个class的内容。
+
+  ```html
+  <!-- reset/override all class names with a binding  -->
+  <div class="bad curly special" [class]="badCurly">Bad curly</div>
+  ```
+
+  **对比记忆更深刻**
+  `Angular` 也是使用的模版绑定的语法，但是最后两者的形式却完全不同
+
+  那么`Angular`的方法这么鸡肋，那不是完蛋了嘛？NO!`Angular`与`Vue`、`React`不同的地方就是：他是一个 **大而全的框架**
+  换句话说，他还有方法来实现这个需求，来看代码；
+
+  ```html
+  <!-- toggle the "special" class on/off with a property -->
+  <div [class.special]="isSpecial">The class binding is special</div>
+
+  <!-- binding to `class.special` trumps the class attribute -->
+  <div class="special"
+       [class.special]="!isSpecial">This one is not so special</div>
+  ```
+
+  实测，这种方法中两个`class`不会互相覆盖。但是这个方法如果想控制多个的时候难不成要写多个`[class.xxx]=“xxx”`的东西，没错，是的！
+  但是实际上还有一个更好的方法来管理类名😂；
+
+  **NgClass**
+
+  你经常用动态添加或删除 `CSS` 类的方式来控制元素如何显示。通过绑定到 `NgClass` ，可以同时添加或移除多个类。
+  CSS 类绑定是添加或删除 **单个类**的最佳途径。
+  当想要同时添加或移除多个CSS类时，NgClass 可能是更好的选择。
+
+  ```js
+  currentClasses: {};
+  setCurrentClasses() {
+    // CSS classes: added/removed per current state of component properties
+    this.currentClasses =  {
+      'saveable': this.canSave,
+      'modified': !this.isUnchanged,
+      'special':  this.isSpecial
+    };
+  }
+  ```
+
+  ```js
+  <div [ngClass]="currentClasses">This div is initially saveable, unchanged, and special</div>
+  ```
+
+  **样式绑定**
+
+  通过样式绑定，可以设置内联样式。
+
+  ```html
+    <button [style.color]="isSpecial ? 'red': 'green'">Red</button>
+    <button [style.background-color]="canSave ? 'cyan': 'grey'" >Save</button>
+    <button [style.font-size.em]="isSpecial ? 3 : 1" >Big</button>
+    <button [style.font-size.%]="!isSpecial ? 150 : 50" >Small</button>
   ```
 
 ##### 指令

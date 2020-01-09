@@ -2,6 +2,7 @@
 title: TypeScript 入门教程
 date: 2019-12-10 16:06:49
 tags:
+hidden: true
 description: Regular Expression 使用单个字符串描述、匹配一系列符合某个句法规则的字符串。
 ---
 
@@ -264,3 +265,123 @@ function infiniteLoop(): never {
   while (true) {}
 }
 ```
+
+#### 元组 Tuple
+
+---
+
+元组类型允许表示一个已知元素数量和类型的数组，各元素的类型不必相同。
+
+```ts
+// 此处就好像是把数组先声明个类型，而且是一个复杂类型的数组
+let x: [string, number];
+x = ["hello", 10];
+```
+
+当访问一个已知索引的元素，会得到正确的类型：
+
+```ts
+console.log(x[0].substr(1)); // OK
+console.log(x[1].substr(1)); // Error, 'number' does not have 'substr
+```
+
+当访问一个越界元素的时候会使用联合类型替代：
+
+```ts
+x[3] = "world"; // OK,字符串可以赋值给（string|number）类型
+console.log(x[5].toString()); // OK,'string' 和 ‘number’ 都有toString
+x[6] = true; //Error,布尔不是（ string | number ）类型
+```
+
+联合类型是高级主题。
+
+#### 枚举
+
+---
+
+`enum` 类型是对 JavaScript 标准类型的一个补充。使用枚举类型可以为一组数值赋予友好的名字。
+
+```ts
+enum Color {
+  Red,
+  Green,
+  Blue
+}
+let c: Color = Color.Green;
+```
+
+默认情况下，从`0`开始为元素标号。我们可以手动的制定成员的数值。例如我们将上面的例子改成从`1`开始标号：
+
+```ts
+enum Color { Red=1, Green, Blue }
+let c: Color = Color:Green;
+```
+
+或者全部采用手动赋值：
+
+```ts
+enum Color { Red=1, Green=2, Blue=4 }
+let c: Color = Color:Green;
+```
+
+枚举类型提供的一个便利是你可以有枚举的值得到它的名字。例如，我们知道数值为 2，但是不确定它映射到 Color 里的哪个名字，我们可以查找相应的名字：
+
+```ts
+enum Color {
+  Red = 1,
+  Green,
+  Blue
+}
+let colorName: string = Color[2];
+
+// 下行代码会显示Green，因为上面代码里它的值是2
+console.log(colorName);
+```
+
+#### 类型断言
+
+---
+
+有时候你会遇到这样的情况，你会比 typescript 更加了解某个值的详细信息。通常这会发生在你清楚的知道一个实体具有比它现有类型更确切的类型。
+
+类型断言有两种形式。其一是“尖括号”语法：
+
+```ts
+let someValue: any = "this is a string";
+let strLength: number = (<string>someValue).length;
+```
+
+其二是`as`语法：
+
+```ts
+let someValue: any = "this is a string";
+let strLength: number = (someValue as string).lenght;
+```
+
+两种形式是等价的。JSX 里面只有`as`语法断言是被允许的。
+
+
+### 变量声明
+
+---
+
+`let` 和 `const` 是JavaScript里相对较新的变量声明方式。`let`在很多方面与`var`是相似的，但是可以帮助大家避免在JavaScript里常见的一些问题。`const`是对`let`的一个增强，它能阻止对一个变量的再次赋值。
+
+#### var 声明
+
+---
+
+一直以来我们都是通过`var`关键字定义JavaScript变量。
+
+```js
+var a = 10;
+```
+
+我们也可以在函数内部定义变量：
+
+```js
+function f() {
+  var messag
+}
+
+

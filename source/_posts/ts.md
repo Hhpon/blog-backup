@@ -2,7 +2,7 @@
 title: TypeScript 入门教程
 date: 2019-12-10 16:06:49
 tags:
-hidden: true
+hidden: false
 description: Regular Expression 使用单个字符串描述、匹配一系列符合某个句法规则的字符串。
 ---
 
@@ -90,7 +90,7 @@ var user = [0, 1, 2];
 console.log(sayHello(user));
 ```
 
-**但是我们是可以配置 ts 报错的时候是否还要产出 js 文件的，可以在 tsconfig.json 中配置 noEmitOnError 即可。关于 tsconfig.jsonde,请参阅[官方文档](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html)([中文文档](https://zhongsp.gitbooks.io/typescript-handbook/content/doc/handbook/tsconfig.json.html))**
+**但是我们是可以配置 ts 报错的时候是否还要产出 js 文件的，可以在 tsconfig.json 中配置 noEmitOnError 即可。关于 tsconfig.jsonde,请参阅[官方文档](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html)**
 
 ### 基础类型
 

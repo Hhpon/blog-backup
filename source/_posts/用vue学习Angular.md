@@ -246,3 +246,98 @@ Vue 的目录是脚手架自动创建的，App.vue 是 Vue 项目的根组件，
 
 - 模版表单在平时还是比较好用的
 - 响应式表单虽然很复杂，但是很强大的
+#### 父子组件之间的值的传递
+
+---
+
+##### 回忆Vue的方法
+
+###### 父组件给子组件传递数据
+
+**Vue**
+
+```html
+<!-- 我们在这里封装一个组件 -->
+<template>
+  <div class="card-info">
+    我是一个子组件，我用来显示{{someThing}}
+  </div>
+</template>
+<script>
+export default {
+  props: {
+    someThing: {
+      type: String,
+      default: ''
+    }
+  }
+};
+</script>
+
+<card-info :someThing='someThing'></card-info>
+```
+事实上，我们在其他的两大框架中我们都是通过Props的方式在子组件中获取父组件传递的参数。
+
+```js
+import { Component, Input } from '@angular/core';
+ 
+import { Hero } from './hero';
+ 
+@Component({
+  selector: 'app-hero-child',
+  template: `
+    <h3>{{hero.name}} says:</h3>
+    <p>I, {{hero.name}}, am at your service, {{masterName}}.</p>
+  `
+})
+export class HeroChildComponent {
+  @Input() hero: Hero;
+  @Input('master') masterName: string;
+}
+```
+```html
+<app-hero-child [hero]='hero></app-hero-child>
+```
+
+在`Angular`中，我们是通过`@Input()`装饰器的方式来声明这个属性可以通过父组件传递过来，事实上`Augular` `Vue`之间父组件给子组件传递数据的时候也就是这个地方有一个小区别。
+
+除此之外，对于组件的数据传输方面，我们有时候可能需要处理一下我们获取到的数据，如果我们使用的是`Vue`的话，我们可能会使用计算属性`computed`。
+
+例如
+
+```html
+<template>
+  <div class="card-info">
+    我是一个子组件，我用来显示{{name}}
+  </div>
+</template>
+<script>
+export default {
+  props: {
+    someThing: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    name() {
+      if(this.someThing){
+        return '刘德华'
+      }
+      return '梁朝伟'
+    }
+  }
+};
+</script>
+
+<card-info :someThing='someThing'></card-info>
+```
+
+但是在`Angular`中，我们有两种方法修改父组件传过来的数据
+
+- setter
+- ngOnChanges
+
+具体也没什么说的，可以参考一下中文文档
+
+[通过setter截听输入属性值的变化](https://angular.cn/guide/component-interaction#intercept-input-property-changes-with-a-setter)

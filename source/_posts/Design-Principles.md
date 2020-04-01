@@ -1,5 +1,5 @@
 ---
-title: Design-Principles
+title: 开闭原则
 date: 2020-03-24 11:49:03
 tags:
 description: 设计原则之开闭原则，原文博客使用的java语言示例，本文使用typescript，都是静态语言。

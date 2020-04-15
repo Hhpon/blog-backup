@@ -1,5 +1,5 @@
 ---
-title: singleton
+title: 单例模式
 date: 2020-04-01 12:46:16
 tags:
 description: 对于系统中的某些类来说，只有一个实例很重要，例如前端系统内的弹出窗。

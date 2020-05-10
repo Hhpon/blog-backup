@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hhpon
+title: Hhpon的学习笔记
 subtitle: ""
 description: ""
 keywords:
@@ -97,5 +97,5 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/Hhpon/hhpon.github.io.git
+  repo: git@github.com:Hhpon/hhpon.github.io.git
   branch: master

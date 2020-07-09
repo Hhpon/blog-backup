@@ -236,7 +236,7 @@ Vue 的目录是脚手架自动创建的，App.vue 是 Vue 项目的根组件，
     <button [style.font-size.%]="!isSpecial ? 150 : 50" >Small</button>
   ```
 
-##### 指令
+##### 指令 
 
 - v-if === \*ngIf
 - v-bind === []

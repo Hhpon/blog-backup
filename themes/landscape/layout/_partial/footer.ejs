@@ -1,0 +1,11 @@
+<footer id="footer">
+  <% if (theme.sidebar === 'bottom'){ %>
+    <%- partial('_partial/sidebar') %>
+  <% } %>
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; <%= date(new Date(), 'YYYY') %> <%= config.author || config.title %>12312312
+      <%= __('powered_by') %> <a href="http://beian.miit.gov.cn/state/outPortal/loginPortal.action" target="_blank">黑ICP备17009853号</a>
+    </div>
+  </div>
+</footer>

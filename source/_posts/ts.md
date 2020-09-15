@@ -2,7 +2,7 @@
 title: TypeScript 入门教程
 date: 2019-12-10 16:06:49
 tags:
-hidden: false
+hidden: true
 description: Regular Expression 使用单个字符串描述、匹配一系列符合某个句法规则的字符串。
 ---
 

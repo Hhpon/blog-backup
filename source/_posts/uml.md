@@ -31,4 +31,90 @@ UML 的概念包括了 UML 语义（Semantics）和 UML 表示符（Notation）�
 
 **接口是一种特殊的类，具有类的结构但不可被实例化，只可以被实现（继承）。在 UML 中，接口使用一个带有名称的小圆圈来进行表示。**
 
+{% asset_img interface.png 接口 %}
+
 #### 一个稍微全一点的 UML 类图
+
+{% asset_img uml_class_struct.jpg UML %}
+
+### 类之间的关系
+
+---
+
+- 泛化关系 -- 类与类之间的继承 -- 三角形符号 + 实线
+- 实现关系 -- 接口与类之间的实现 -- 三角形符号 + 虚线
+- 聚合关系 -- 被指的类由另一个类组成，但是组成方式为保存标识 -- 空心菱形符号 + 实线
+- 组合关系 -- 被指的类有另一个类组成，组成方式为内嵌 -- 实心菱形符号 + 实线
+- 关联关系 -- 在实例化A类的时候需要B类作为参数 -- 箭头 + 实线
+- 依赖关系 -- A类当中的方法中使用了B类的方法或者变量 -- 箭头 + 虚线
+
+*关联关系与依赖关系还不能完全理解，这一段等到可以理解之后再来补充*
+
+#### 各个关系的详细说明
+
+##### 泛化关系(generalization)
+
+类的继承结构表现在uml中为：泛化与实现
+
+{% asset_img uml_generalize.jpg generalization %}
+
+##### 实现关系(realize)
+
+{% asset_img uml_realize.jpg realize %}
+
+##### 聚合关系(aggregation)
+
+{% asset_img uml_aggregation.jpg aggregation %}
+
+聚合关系用于表示实体对象之间的关系，表示整体由部分构成的语义；例如一个部门有多个员工组成；
+
+聚合关系应用数据库的知识很好理解，比如我们有两个集合，分别是学生信息与学生成绩；当我们在学生成绩集合中存储对应学生集合中唯一标识的时候我们认为这两个对象之间就是聚合关系。所以当整体(学生成绩)不存在了,个体依然不受影响。
+
+##### 组合关系(composition)
+
+{% asset_img uml_composition.jpg composition %}
+
+组合关系同样表示整体由部分组成的语义；比如公司有多个部门构成；
+
+组合关系应用到数据库的知识同样很好理解，比如我们有两个集合，还是学生信息和学生成绩；当我们在学生成绩集合中直接存储学生信息的时候我们认为这两个对象之间就是组合关系。所以当整体(学生成绩)不存在了，学生信息也不存在了。
+
+##### 关联关系
+
+{% asset_img uml_association.jpg association %}
+
+```ts
+// typescript
+class A{
+  construct(b:B){
+    this.b = b
+  }
+}
+
+class B{
+  construct(){}
+}
+
+const b = new B()
+
+new A(b)
+```
+
+A与B就是关联关系，依赖注入，这种方式在前端框架Angular中特别常见。
+
+##### 依赖关系(dependency)\
+
+{% asset_img uml_dependency.jpg dependency %}
+
+```ts
+class Obj1{
+  construct(a) {this.a = a}
+}
+const obj1 = new Obj1(10)
+
+class Obj2{
+  construct(b){this.b = b}
+  cal() {
+    return b * obj1.a
+  }
+}
+```

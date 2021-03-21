@@ -2,6 +2,8 @@
 title: Summary of JavaScript basics
 date: 2021-02-25 16:18:04
 tags:
+hidden: true
+description: JavaScript 基础知识的一个查缺补漏
 ---
 
 ## JavaScript 的组成
